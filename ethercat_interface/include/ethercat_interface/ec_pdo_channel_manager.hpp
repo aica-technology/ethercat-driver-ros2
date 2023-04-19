@@ -18,7 +18,8 @@
 #define ETHERCAT_INTERFACE__EC_PDO_CHANNEL_MANAGER_HPP_
 
 #include <ecrt.h>
-#include <string>
+#include <cstring>
+#include <iostream>
 #include <vector>
 #include <limits>
 
@@ -65,6 +66,11 @@ public:
       last_value = static_cast<double>(EC_READ_U64(domain_address));
     } else if (data_type == "int64") {
       last_value = static_cast<double>(EC_READ_S64(domain_address));
+    } else if (data_type == "real") {
+      uint32_t value = EC_READ_S32(domain_address);
+      float ret;
+      memcpy(&ret, &value, sizeof(float));
+      last_value = static_cast<double>(ret);
     } else {
       last_value = static_cast<double>(EC_READ_U8(domain_address) & data_mask);
     }
@@ -190,7 +196,7 @@ public:
       return 8;
     } else if (type == "int16" || type == "uint16") {
       return 16;
-    } else if (type == "int32" || type == "uint32") {
+    } else if (type == "int32" || type == "uint32" || type == "real") {
       return 32;
     } else if (type == "int64" || type == "uint64") {
       return 64;
