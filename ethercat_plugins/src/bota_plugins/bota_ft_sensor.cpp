@@ -5,10 +5,10 @@
 
 namespace ethercat_plugins {
 
-class SensOneFtSensor : public ethercat_interface::EcSlave {
+class BotaFtSensor : public ethercat_interface::EcSlave {
 public:
-  SensOneFtSensor() : EcSlave(0x0000b07a, 0x00000001) {}
-  virtual ~SensOneFtSensor() {}
+  BotaFtSensor() : EcSlave(0x0000b07a, 0x00000001) {}
+  virtual ~BotaFtSensor() {}
   virtual void processData(size_t index, uint8_t* domain_address) {
     if (data_index_[index] >= 0) {
       uint32_t value = EC_READ_S32(domain_address);
@@ -99,4 +99,4 @@ private:
 
 #include <pluginlib/class_list_macros.hpp>
 
-PLUGINLIB_EXPORT_CLASS(ethercat_plugins::SensOneFtSensor, ethercat_interface::EcSlave)
+PLUGINLIB_EXPORT_CLASS(ethercat_plugins::BotaFtSensor, ethercat_interface::EcSlave)
