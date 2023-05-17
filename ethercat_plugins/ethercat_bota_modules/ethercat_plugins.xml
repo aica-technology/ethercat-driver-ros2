@@ -1,5 +1,5 @@
 <library path="ethercat_bota_modules">
-  <class name="ethercat_plugins/Bota_SensONE" type="ethercat_plugins::SensOneFtSensor" base_class_type="ethercat_interface::EcSlave">
-    <description>Bota SensONE force torque sensor</description>
+  <class name="ethercat_plugins/Bota_FTSensor" type="ethercat_plugins::BotaFtSensor" base_class_type="ethercat_interface::EcSlave">
+    <description>Bota Systems force torque sensor</description>
   </class>
 </library>
