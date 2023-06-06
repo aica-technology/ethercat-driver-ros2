@@ -12,8 +12,8 @@ find_package(rclcpp REQUIRED)
 
 # EtherLab
 include(ExternalProject)
-option(ETHERLAB_FLAGS "EtherLab configuration flags" --disable-8139too --disable-eoe --enable-generic --disable-kernel --with-systemdsystemunitdir=no)
-option(ETHERLAB_DIR "Where to install EtherLab" ${CMAKE_INSTALL_PREFIX})
+option(ETHERLAB_FLAGS "EtherLab configuration flags" "--disable-8139too --disable-eoe --enable-generic --disable-kernel --with-systemdsystemunitdir=no")
+option(ETHERLAB_DIR "Where to install EtherLab" "${CMAKE_INSTALL_PREFIX}")
 ExternalProject_Add(
   etherlab
   GIT_REPOSITORY https://gitlab.com/etherlab.org/ethercat.git
