@@ -11,10 +11,21 @@ find_package(ament_cmake_ros REQUIRED)
 find_package(rclcpp REQUIRED)
 
 # EtherLab
-set(ETHERLAB_DIR /usr/local/etherlab)
+include(ExternalProject)
+option(ETHERLAB_FLAGS "EtherLab configuration flags" --disable-8139too --disable-eoe --enable-generic --disable-kernel --with-systemdsystemunitdir=no)
+option(ETHERLAB_DIR "Where to install EtherLab" ${CMAKE_INSTALL_PREFIX})
+ExternalProject_Add(
+  etherlab
+  GIT_REPOSITORY https://gitlab.com/etherlab.org/ethercat.git
+  GIT_TAG stable-1.5
+  GIT_SUBMODULES "" # Disable submodules
+  BUILD_IN_SOURCE ON
+  CONFIGURE_COMMAND ./bootstrap && ./configure ${ETHERLAB_FLAGS} --prefix=${ETHERLAB_DIR}
+  BUILD_COMMAND make
+  INSTALL_COMMAND make install
+)
+set(ETHERCAT_LIBRARY ${ETHERLAB_DIR}/lib/libethercat.so)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-find_library(ETHERCAT_LIB ethercat HINTS ${ETHERLAB_DIR}/lib)
 
 ament_export_include_directories(
   include
@@ -33,7 +44,7 @@ target_include_directories(
   ${ETHERLAB_DIR}/include
 )
 
-target_link_libraries(${PROJECT_NAME} ${ETHERCAT_LIB})
+target_link_libraries(${PROJECT_NAME} ${ETHERCAT_LIBRARY})
 
 ament_target_dependencies(
   ${PROJECT_NAME}
