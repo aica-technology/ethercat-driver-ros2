@@ -40,11 +40,11 @@ add_dependencies(etherlab etherlab_project)
 set_target_properties(etherlab PROPERTIES IMPORTED_LOCATION "${ETHERLAB_LIBRARY_DIRS}/libethercat.so")
 install(
   DIRECTORY ${ETHERLAB_INCLUDE_DIRS}/
-  DESTINATION include
+  DESTINATION etherlab/include
 )
 install(
   DIRECTORY ${ETHERLAB_LIBRARY_DIRS}/
-  DESTINATION lib
+  DESTINATION etherlab/lib
 )
 ament_export_include_directories(
   include
