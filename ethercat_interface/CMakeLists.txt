@@ -40,7 +40,7 @@ add_library(etherlab SHARED IMPORTED)
 add_dependencies(etherlab etherlab_project)
 set_target_properties(etherlab PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${ETHERLAB_INCLUDE_DIRS}"
-  IMPORTED_LOCATION "${ETHERLAB_LIBRARY_DIRS}/libethercat.a"
+  IMPORTED_LOCATION "${ETHERLAB_LIBRARY_DIRS}/libethercat.so"
 )
 install(
   DIRECTORY ${ETHERLAB_INCLUDE_DIRS}/
