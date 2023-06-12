@@ -46,10 +46,6 @@ install(
   DIRECTORY ${ETHERLAB_LIBRARY_DIRS}/
   DESTINATION etherlab/lib
 )
-ament_export_include_directories(
-  include
-  ${ETHERLAB_INCLUDE_DIRS}
-)
 
 add_library(
   ${PROJECT_NAME}
@@ -102,10 +98,12 @@ endif()
 ## EXPORTS
 ament_export_include_directories(
   include
+  etherlab/include
 )
-ament_export_libraries(
+ament_export_targets(
   ${PROJECT_NAME}
   ${ETHERCAT_LIBRARY}
+  HAS_LIBRARY_TARGET
 )
 ament_export_dependencies(
   rclcpp
