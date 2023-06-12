@@ -18,8 +18,8 @@ set(ETHERLAB_FLAGS
 )
 message(STATUS "EtherLab configuration flags: ${ETHERLAB_FLAGS}")
 include(ExternalProject)
-set(ETHERLAB_SRC_DIR "${CMAKE_BINARY_DIR}/etherlab-src")
-set(ETHERLAB_DST_DIR "${CMAKE_BINARY_DIR}/etherlab")
+set(ETHERLAB_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/etherlab-src")
+set(ETHERLAB_DST_DIR "${CMAKE_CURRENT_BINARY_DIR}/etherlab")
 ExternalProject_Add(
   etherlab_project
   GIT_REPOSITORY https://gitlab.com/etherlab.org/ethercat.git
@@ -31,36 +31,37 @@ ExternalProject_Add(
   BUILD_COMMAND make
   INSTALL_COMMAND make install
 )
-set(ETHERLAB_INCLUDE_DIRS "${ETHERLAB_SRC_DIR}/include")
+set(ETHERLAB_INCLUDE_DIRS "${ETHERLAB_DST_DIR}/include")
 set(ETHERLAB_LIBRARY_DIRS "${ETHERLAB_DST_DIR}/lib")
 set(ETHERCAT_LIBRARY etherlab)
 
 add_library(etherlab SHARED IMPORTED)
 add_dependencies(etherlab etherlab_project)
-set_target_properties(etherlab PROPERTIES IMPORTED_LOCATION "${ETHERLAB_LIBRARY_DIRS}/libethercat.so")
+set_target_properties(etherlab PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${ETHERLAB_INCLUDE_DIRS}"
+  IMPORTED_LOCATION "${ETHERLAB_LIBRARY_DIRS}/libethercat.a"
+)
 install(
   DIRECTORY ${ETHERLAB_INCLUDE_DIRS}/
-  DESTINATION etherlab/include
+  DESTINATION include
 )
 install(
   DIRECTORY ${ETHERLAB_LIBRARY_DIRS}/
-  DESTINATION etherlab/lib
+  DESTINATION lib
 )
 
 add_library(
   ${PROJECT_NAME}
   SHARED
   src/ec_master.cpp)
-add_dependencies(${PROJECT_NAME} etherlab_project)
 
 target_include_directories(
   ${PROJECT_NAME}
   PRIVATE
   include
-  ${ETHERLAB_INCLUDE_DIRS}
 )
 
-target_link_libraries(${PROJECT_NAME} ${ETHERCAT_LIBRARY})
+target_link_libraries(${PROJECT_NAME} etherlab)
 
 ament_target_dependencies(
   ${PROJECT_NAME}
@@ -88,7 +89,6 @@ if(BUILD_TESTING)
     test_ec_pdo_channel_manager
     test/test_ec_pdo_channel_manager.cpp
   )
-  add_dependencies(test_ec_pdo_channel_manager etherlab_project)
   target_include_directories(test_ec_pdo_channel_manager PRIVATE include ${ETHERLAB_INCLUDE_DIRS})
   ament_target_dependencies(test_ec_pdo_channel_manager
     yaml_cpp_vendor
@@ -98,12 +98,9 @@ endif()
 ## EXPORTS
 ament_export_include_directories(
   include
-  etherlab/include
 )
-ament_export_targets(
+ament_export_libraries(
   ${PROJECT_NAME}
-  ${ETHERCAT_LIBRARY}
-  HAS_LIBRARY_TARGET
 )
 ament_export_dependencies(
   rclcpp
