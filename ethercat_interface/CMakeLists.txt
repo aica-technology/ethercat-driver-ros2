@@ -35,6 +35,7 @@ set(ETHERLAB_INCLUDE_DIRS "${ETHERLAB_DST_DIR}/include")
 set(ETHERLAB_LIBRARY_DIRS "${ETHERLAB_DST_DIR}/lib")
 set(ETHERCAT_LIBRARY etherlab)
 
+file(MAKE_DIRECTORY "${ETHERLAB_INCLUDE_DIRS}") # else INTERFACE_INCLUDE_DIRECTORIES will complain...
 add_library(etherlab SHARED IMPORTED)
 add_dependencies(etherlab etherlab_project)
 set_target_properties(etherlab PROPERTIES
