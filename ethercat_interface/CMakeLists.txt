@@ -90,7 +90,8 @@ if(BUILD_TESTING)
     test_ec_pdo_channel_manager
     test/test_ec_pdo_channel_manager.cpp
   )
-  target_include_directories(test_ec_pdo_channel_manager PRIVATE include ${ETHERLAB_INCLUDE_DIRS})
+  target_include_directories(test_ec_pdo_channel_manager PRIVATE include)
+  target_link_libraries(test_ec_pdo_channel_manager etherlab)
   ament_target_dependencies(test_ec_pdo_channel_manager
     yaml_cpp_vendor
   )
