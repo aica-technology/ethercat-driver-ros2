@@ -3,4 +3,6 @@
 !ethercat_driver_ros2
 !ethercat_generic_plugins
 !ethercat_interface
+!ethercat_manager
+!ethercat_msgs
 !ethercat_plugins
