@@ -1,7 +1,6 @@
 #include <cstring>
 
 #include "ethercat_interface/ec_slave.hpp"
-#include "ethercat_plugins/commondefs.hpp"
 
 namespace ethercat_plugins {
 

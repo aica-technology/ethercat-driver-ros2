@@ -1,7 +1,6 @@
 #!/bin/bash
 
-BASE_IMAGE_NAME=ghcr.io/aica-technology/ros2-modulo-control
-BASE_IMAGE_TAG=humble-devel
+ROS2_VERSION=iron
 
 IMAGE_NAME=aica-technology/ethercat-driver-ros2
 IMAGE_TAG=latest
@@ -40,15 +39,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 BUILD_FLAGS+=(--build-arg BASE_IMAGE_NAME="${BASE_IMAGE_NAME}")
-BUILD_FLAGS+=(--build-arg BASE_IMAGE_TAG="${BASE_IMAGE_TAG}")
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  BUILD_FLAGS+=(--ssh default="${SSH_AUTH_SOCK}")
-else
-  BUILD_FLAGS+=(--ssh default="$HOME/.ssh/id_rsa")
-fi
+BUILD_FLAGS+=(--build-arg ROS2_VERSION="${ROS2_VERSION}")
 BUILD_FLAGS+=(-t "${IMAGE_NAME}:${IMAGE_TAG}")
 
-docker pull ${BASE_IMAGE_NAME}:${BASE_IMAGE_TAG}
 DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" . || exit 1
 
 if [ "${SERVE_REMOTE}" = true ]; then
