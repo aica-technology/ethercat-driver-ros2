@@ -12,7 +12,6 @@
   <depend>ethercat_interface</depend>
   <depend>ethercat_generic_slave</depend>
   <depend>pluginlib</depend>
-  <depend>yaml_cpp_vendor</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

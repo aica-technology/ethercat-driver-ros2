@@ -1,10 +1,9 @@
-#syntax=docker/dockerfile:1.4.0
-ARG ROS2_VERSION=iron
-FROM ghcr.io/aica-technology/ros2-control:${ROS2_VERSION} as base
+ARG BASE_VERSION=v2.0.0-jazzy
+FROM ghcr.io/aica-technology/ros2-ws:${BASE_VERSION} AS base
 
 # setup the environment
 USER ${USER}
-ENV WORKSPACE ${HOME}/ws
+ENV WORKSPACE=${HOME}/ws
 WORKDIR ${WORKSPACE}
 SHELL ["/bin/bash", "-l", "-c"]
 
@@ -14,14 +13,14 @@ RUN source ${HOME}/ros2_ws/install/setup.bash && colcon build
 RUN echo "source ${WORKSPACE}/install/setup.bash" | cat - ${HOME}/.bashrc > tmp && mv tmp ${HOME}/.bashrc
 
 
-FROM base as development
+FROM base AS development
 
 # copy the source folder in the workspace
 WORKDIR ${WORKSPACE}
 COPY --chown=${USER} . ./src/
 
 
-FROM development as production
+FROM development AS production
 
 # build the component workspace
 RUN source ${HOME}/.bashrc; colcon build --symlink-install

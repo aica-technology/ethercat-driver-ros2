@@ -10,7 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
 find_package(ethercat_interface REQUIRED)
 find_package(pluginlib REQUIRED)
-find_package(yaml_cpp_vendor REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 file(GLOB_RECURSE PLUGINS_SRC src/*.cpp)
 add_library(ethercat_generic_slave ${PLUGINS_SRC})
@@ -22,7 +22,7 @@ ament_target_dependencies(
   ethercat_generic_slave
   ethercat_interface
   pluginlib
-  yaml_cpp_vendor
+  yaml-cpp
 )
 
 pluginlib_export_plugin_description_file(ethercat_interface ethercat_plugins.xml)
@@ -65,6 +65,7 @@ if(BUILD_TESTING)
   target_include_directories(test_generic_ec_slave PRIVATE include)
   target_link_libraries(test_generic_ec_slave
     ethercat_generic_slave
+    yaml-cpp
   )
   ament_target_dependencies(test_generic_ec_slave
     pluginlib
