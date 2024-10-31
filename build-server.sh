@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ROS2_VERSION=iron
+BASE_VERSION=v2.0.0-jazzy
 
 IMAGE_NAME=aica-technology/ethercat-driver-ros2
 IMAGE_TAG=latest
@@ -38,8 +38,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-BUILD_FLAGS+=(--build-arg BASE_IMAGE_NAME="${BASE_IMAGE_NAME}")
-BUILD_FLAGS+=(--build-arg ROS2_VERSION="${ROS2_VERSION}")
+BUILD_FLAGS+=(--build-arg BASE_VERSION="${BASE_VERSION}")
 BUILD_FLAGS+=(-t "${IMAGE_NAME}:${IMAGE_TAG}")
 
 DOCKER_BUILDKIT=1 docker build "${BUILD_FLAGS[@]}" . || exit 1

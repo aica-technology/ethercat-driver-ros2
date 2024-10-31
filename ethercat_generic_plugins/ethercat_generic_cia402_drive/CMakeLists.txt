@@ -11,7 +11,7 @@ find_package(ament_cmake_ros REQUIRED)
 find_package(ethercat_interface REQUIRED)
 find_package(ethercat_generic_slave REQUIRED)
 find_package(pluginlib REQUIRED)
-find_package(yaml_cpp_vendor REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 file(GLOB_RECURSE PLUGINS_SRC src/*.cpp)
 add_library(ethercat_generic_cia402_drive ${PLUGINS_SRC})
@@ -24,7 +24,7 @@ ament_target_dependencies(
   ethercat_interface
   ethercat_generic_slave
   pluginlib
-  yaml_cpp_vendor
+  yaml-cpp
 )
 
 pluginlib_export_plugin_description_file(ethercat_interface ethercat_plugins.xml)
@@ -68,6 +68,7 @@ if(BUILD_TESTING)
   target_include_directories(test_generic_ec_cia402_drive PRIVATE include)
   target_link_libraries(test_generic_ec_cia402_drive
     ethercat_generic_cia402_drive
+    yaml-cpp
   )
   ament_target_dependencies(test_generic_ec_cia402_drive
     pluginlib

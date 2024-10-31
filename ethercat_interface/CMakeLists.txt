@@ -23,7 +23,7 @@ set(ETHERLAB_DST_DIR "${CMAKE_CURRENT_BINARY_DIR}/etherlab")
 ExternalProject_Add(
   etherlab_project
   GIT_REPOSITORY https://gitlab.com/etherlab.org/ethercat.git
-  GIT_TAG stable-1.5
+  GIT_TAG 1.6.2
   GIT_SUBMODULES "" # Disable submodules
   SOURCE_DIR ${ETHERLAB_SRC_DIR}
   BUILD_IN_SOURCE ON
@@ -82,7 +82,7 @@ install(
 if(BUILD_TESTING)
   # find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_lint_auto REQUIRED)
-  find_package(yaml_cpp_vendor REQUIRED)
+  find_package(yaml-cpp REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
   # Test PdoChannelManager
@@ -91,9 +91,9 @@ if(BUILD_TESTING)
     test/test_ec_pdo_channel_manager.cpp
   )
   target_include_directories(test_ec_pdo_channel_manager PRIVATE include)
-  target_link_libraries(test_ec_pdo_channel_manager etherlab)
+  target_link_libraries(test_ec_pdo_channel_manager etherlab yaml-cpp)
   ament_target_dependencies(test_ec_pdo_channel_manager
-    yaml_cpp_vendor
+    yaml-cpp
   )
 endif()
 
@@ -106,5 +106,6 @@ ament_export_libraries(
 )
 ament_export_dependencies(
   rclcpp
+  yaml-cpp
 )
 ament_package()
