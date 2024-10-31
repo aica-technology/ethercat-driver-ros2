@@ -8,6 +8,34 @@ Installing EtherLab
 The proposed development builds upon the `IgH EtherCAT Master <https://etherlab.org/en/ethercat/>`_.
 Installation steps are summarized here:
 
+* Verify that you can run unsigned kernel modules
+
+Etherlab is a kernel module that is not signed by default.
+To allow the kernel to load unsigned modules, you need to disable secure boot.
+
+Verify if secure boot is enabled (you need to install ''mokutil'' first):
+  .. code-block:: console
+
+    $ sudo apt-get install mokutil
+    $ mokutil --sb-state
+
+it should print:
+  .. code-block:: console
+
+    SecureBoot disabled
+
+if it prints:
+  .. code-block:: console
+
+    SecureBoot enabled
+
+Then you need to disable secure boot.
+To do so:
+
+  1. reboot your computer and enter the BIOS settings.
+  2. In the security tab, disable secure boot.
+  3. Save and exit.
+
 * Install required tools:
 
   .. code-block:: console
@@ -37,7 +65,6 @@ Installation steps are summarized here:
     $ sudo make modules_install install
     $ sudo depmod
 
-  .. note:: This step is needed every time the Linux kernel is updated.
 * Configure system:
 
   .. code-block:: console
@@ -46,6 +73,28 @@ Installation steps are summarized here:
     $ sudo ln -s /usr/local/etherlab/etc/init.d/ethercat /etc/init.d/ethercat
     $ sudo mkdir -p /etc/sysconfig
     $ sudo cp /usr/local/etherlab/etc/sysconfig/ethercat /etc/sysconfig/ethercat
+
+  .. note::
+
+    These 4 steps may be needed every time the Linux kernel is updated.
+    Before re-doing the 4 steps, you can try the following lighter steps:
+
+    Go in the folder where the ethercat project was cloned, from step 2 (Setup sources) do:
+
+    .. code-block:: console
+
+      cd ethercat
+      sudo rm /usr/bin/ethercat /etc/init.d/ethercat
+      ./bootstrap
+
+    Do integrally step 3 (Configure, build and install ...)
+    From Step 4 (Configure system)
+
+    .. code-block:: console
+
+     sudo ln -s /usr/local/etherlab/bin/ethercat /usr/bin/
+     sudo ln -s /usr/local/etherlab/etc/init.d/ethercat /etc/init.d/ethercat
+
 
 * Create a new :code:`udev` rule:
 

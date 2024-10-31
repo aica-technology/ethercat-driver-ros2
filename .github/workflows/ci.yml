@@ -1,11 +1,18 @@
 name: CI
 on:
+  workflow_dispatch:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 jobs:
   CI:
+    permissions:
+      contents: read
+      packages: write
+      issues: read
+      checks: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Prepare
@@ -47,7 +54,7 @@ jobs:
             colcon test-result
 
       - name: Upload Tests to Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
