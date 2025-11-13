@@ -23,6 +23,20 @@
 
 namespace ethercat_driver
 {
+EthercatDriver::~EthercatDriver()
+{
+  if (activated_) {
+    const std::lock_guard<std::mutex> lock(ec_mutex_);
+    activated_ = false;
+
+    RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "Stopping ...please wait...");
+
+    // stop EC and disconnect
+    master_.stop();
+  }
+  ec_modules_.clear();
+}
+
 CallbackReturn EthercatDriver::on_init(
   const hardware_interface::HardwareInfo & info)
 {
@@ -171,6 +185,12 @@ CallbackReturn EthercatDriver::on_init(
           info_.sensors[s].name.c_str(), ex.what());
       }
     }
+  }
+
+  if (info_.hardware_parameters.count("activation_timeout")) {
+    activation_timeout_ = std::stod(info_.hardware_parameters.at("activation_timeout"));
+  } else {
+    activation_timeout_ = 3;
   }
 
   RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "Got %li modules", ec_modules_.size());
@@ -322,29 +342,25 @@ CallbackReturn EthercatDriver::on_activate(
   clock_gettime(CLOCK_MONOTONIC, &t);
   t.tv_sec++;
 
-  bool running = true;
-  while (running) {
-    // wait until next shot
+  bool operational = false;
+  auto start_time = std::chrono::steady_clock::now();
+
+  while (std::chrono::steady_clock::now() - start_time < std::chrono::duration<double, std::ratio<1>>(this->activation_timeout_) && !operational) {
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);
-    // update EtherCAT bus
-
     master_.update();
-    RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "updated!");
-
-    // check if operational
-    bool isAllInit = true;
+    operational = true;
     for (auto & module : ec_modules_) {
-      isAllInit = isAllInit && module->initialized();
+      operational = operational && module->operational();
     }
-    if (isAllInit) {
-      running = false;
-    }
-    // calculate next shot. carry over nanoseconds into microseconds.
     t.tv_nsec += master_.getInterval();
     while (t.tv_nsec >= 1000000000) {
       t.tv_nsec -= 1000000000;
       t.tv_sec++;
     }
+  }
+  if (!operational) {
+    RCLCPP_ERROR(rclcpp::get_logger("EthercatDriver"), "Not all modules reached operational state");
+    return CallbackReturn::ERROR;
   }
 
   RCLCPP_INFO(

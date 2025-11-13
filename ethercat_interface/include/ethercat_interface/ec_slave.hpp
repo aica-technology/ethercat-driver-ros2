@@ -40,6 +40,7 @@ public:
   /** a pointer to syncs. return &syncs[0] */
   virtual const ec_sync_info_t * syncs() {return NULL;}
   virtual bool initialized() {return true;}
+  virtual bool operational() {return is_operational_;}
   virtual void set_state_is_operational(bool value) {is_operational_ = value;}
   /** Assign activate DC synchronization. return activate word*/
   virtual int assign_activate_dc_sync() {return 0x00;}
