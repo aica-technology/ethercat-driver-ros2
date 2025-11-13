@@ -335,6 +335,7 @@ CallbackReturn EthercatDriver::on_activate(
     RCLCPP_ERROR(rclcpp::get_logger("EthercatDriver"), "Activate EcMaster failed");
     return CallbackReturn::ERROR;
   }
+  activated_ = true;
   RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "Activated EcMaster!");
 
   // start after one second
@@ -365,8 +366,6 @@ CallbackReturn EthercatDriver::on_activate(
 
   RCLCPP_INFO(
     rclcpp::get_logger("EthercatDriver"), "System Successfully started!");
-
-  activated_ = true;
 
   return CallbackReturn::SUCCESS;
 }
