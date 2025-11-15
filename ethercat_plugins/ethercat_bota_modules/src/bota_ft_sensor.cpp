@@ -8,6 +8,7 @@ class BotaFtSensor : public ethercat_interface::EcSlave {
 public:
   BotaFtSensor() : EcSlave(0x0000b07a, 0x00000001) {}
   virtual ~BotaFtSensor() {}
+  virtual bool initialized() { return is_operational_; }
   virtual void processData(size_t index, uint8_t* domain_address) {
     if (data_index_[index] >= 0) {
       uint32_t value = EC_READ_S32(domain_address);

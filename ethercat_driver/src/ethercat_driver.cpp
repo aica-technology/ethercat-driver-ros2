@@ -343,15 +343,15 @@ CallbackReturn EthercatDriver::on_activate(
   clock_gettime(CLOCK_MONOTONIC, &t);
   t.tv_sec++;
 
-  bool operational = false;
+  bool isAllInit = false;
   auto start_time = std::chrono::steady_clock::now();
 
-  while (std::chrono::steady_clock::now() - start_time < std::chrono::duration<double, std::ratio<1>>(this->activation_timeout_) && !operational) {
+  while (std::chrono::steady_clock::now() - start_time < std::chrono::duration<double, std::ratio<1>>(this->activation_timeout_) && !isAllInit) {
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);
     master_.update();
-    operational = true;
+    isAllInit = true;
     for (auto & module : ec_modules_) {
-      operational = operational && module->operational();
+      isAllInit = isAllInit && module->initialized();
     }
     t.tv_nsec += master_.getInterval();
     while (t.tv_nsec >= 1000000000) {
@@ -359,8 +359,8 @@ CallbackReturn EthercatDriver::on_activate(
       t.tv_sec++;
     }
   }
-  if (!operational) {
-    RCLCPP_ERROR(rclcpp::get_logger("EthercatDriver"), "Not all modules reached operational state");
+  if (!isAllInit) {
+    RCLCPP_ERROR(rclcpp::get_logger("EthercatDriver"), "Not all modules reached initialized state");
     return CallbackReturn::ERROR;
   }
 
