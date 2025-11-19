@@ -23,6 +23,20 @@
 
 namespace ethercat_driver
 {
+EthercatDriver::~EthercatDriver()
+{
+  if (activated_) {
+    const std::lock_guard<std::mutex> lock(ec_mutex_);
+    activated_ = false;
+
+    RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "Stopping ...please wait...");
+
+    // stop EC and disconnect
+    master_.stop();
+  }
+  ec_modules_.clear();
+}
+
 CallbackReturn EthercatDriver::on_init(
   const hardware_interface::HardwareInfo & info)
 {
@@ -173,6 +187,12 @@ CallbackReturn EthercatDriver::on_init(
     }
   }
 
+  if (info_.hardware_parameters.count("activation_timeout")) {
+    activation_timeout_ = std::stod(info_.hardware_parameters.at("activation_timeout"));
+  } else {
+    activation_timeout_ = 3;
+  }
+
   RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "Got %li modules", ec_modules_.size());
 
   return CallbackReturn::SUCCESS;
@@ -315,6 +335,7 @@ CallbackReturn EthercatDriver::on_activate(
     RCLCPP_ERROR(rclcpp::get_logger("EthercatDriver"), "Activate EcMaster failed");
     return CallbackReturn::ERROR;
   }
+  activated_ = true;
   RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "Activated EcMaster!");
 
   // start after one second
@@ -322,35 +343,29 @@ CallbackReturn EthercatDriver::on_activate(
   clock_gettime(CLOCK_MONOTONIC, &t);
   t.tv_sec++;
 
-  bool running = true;
-  while (running) {
-    // wait until next shot
+  bool isAllInit = false;
+  auto start_time = std::chrono::steady_clock::now();
+
+  while (std::chrono::steady_clock::now() - start_time < std::chrono::duration<double, std::ratio<1>>(this->activation_timeout_) && !isAllInit) {
     clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);
-    // update EtherCAT bus
-
     master_.update();
-    RCLCPP_INFO(rclcpp::get_logger("EthercatDriver"), "updated!");
-
-    // check if operational
-    bool isAllInit = true;
+    isAllInit = true;
     for (auto & module : ec_modules_) {
       isAllInit = isAllInit && module->initialized();
     }
-    if (isAllInit) {
-      running = false;
-    }
-    // calculate next shot. carry over nanoseconds into microseconds.
     t.tv_nsec += master_.getInterval();
     while (t.tv_nsec >= 1000000000) {
       t.tv_nsec -= 1000000000;
       t.tv_sec++;
     }
   }
+  if (!isAllInit) {
+    RCLCPP_ERROR(rclcpp::get_logger("EthercatDriver"), "Not all modules reached initialized state");
+    return CallbackReturn::ERROR;
+  }
 
   RCLCPP_INFO(
     rclcpp::get_logger("EthercatDriver"), "System Successfully started!");
-
-  activated_ = true;
 
   return CallbackReturn::SUCCESS;
 }

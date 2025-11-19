@@ -41,6 +41,8 @@ class EthercatDriver : public hardware_interface::SystemInterface
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS(EthercatDriver)
 
+  ~EthercatDriver() override;
+
   ETHERCAT_DRIVER_PUBLIC
   CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
 
@@ -89,6 +91,7 @@ private:
   ethercat_interface::EcMaster master_;
   std::mutex ec_mutex_;
   bool activated_;
+  double activation_timeout_;
 };
 }  // namespace ethercat_driver
 
